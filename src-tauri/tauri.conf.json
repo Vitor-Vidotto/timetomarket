@@ -1,0 +1,44 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Time To Market",  
+  "version": "0.1.0",
+  "identifier": "timetomarket",
+  "build": {
+    "frontendDist": "../out",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Time To Market",  
+        "width": 900,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "url":  "http://localhost:3000",
+        "label": "timetomarket", 
+        "visible": false
+      },
+      {
+        "title": "Time To Market", 
+        "width": 900,
+        "height": 800,
+        "url": "splash.html",
+        "label": "splashscreen",
+        "visible": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.ico"
+    ]
+  }
+}
