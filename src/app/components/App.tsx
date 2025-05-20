@@ -1,40 +1,38 @@
 "use client";
-import Link from "next/link";
 import React, { useState } from "react";
+import Image from "next/image";
 
-const appLinks = [
-  { title: "Renomeadores", path: "/renomeadores", imageUrl: "/images/simuladores.png" },
-  { title: "Arquivos", path: "/arquivos", imageUrl: "/images/simuladores.png" },
-  { title: "Verificadores", path: "/indisponivel", imageUrl: "/images/simuladores.png" },
-  { title: "Compiladores", path: "/indisponivel", imageUrl: "/images/simuladores.png" },
-  { title: "Analisadores", path: "/indisponivel", imageUrl: "/images/simuladores.png" },
-  { title: "Simuladores", path: "/indisponivel", imageUrl: "/images/simuladores.png" },
-];
+const LandingPage = () => {
+  const [isShaking, setIsShaking] = useState(false);
 
-const AppLinksGrid = () => {
+  const handleClick = () => {
+    setIsShaking(true);
+    setTimeout(() => setIsShaking(false), 500); // Duração da animação
+  };
+
   return (
-    <div className="w-full flex flex-col items-center">
-      <nav className="w-full text-center p-8">
-      <h1 className="text-3xl font-bold mb-4">Time To Market</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8 mx-auto" style={{ width: '600px'}}>
-          {appLinks.map((app, index) => (
-            <Link
-              key={index}
-              href={app.path}
-              className="relative block h-40 bg-cover bg-center rounded-lg transition duration-300 ease-in-out hover:scale-105"
-              style={{ backgroundImage: `url(${app.imageUrl})` }}
-            >
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center rounded-lg">
-                <h2 className="text-white text-2xl font-semibold">{app.title}</h2>
-              </div>
-            </Link>
-          ))}
+    <main className="w-screen h-screen flex items-center justify-center overflow-hidden">
+      <div className="flex flex-col items-center text-white">
+        <div
+          onClick={handleClick}
+          className={`cursor-pointer animate-bounce-slow ${
+            isShaking ? "animate-shake" : ""
+          }`}
+        >
+          <Image
+            src="/images/teste.png"
+            alt="Logo da Empresa"
+            width={200}
+            height={200}
+            className="drop-shadow-lg"
+          />
         </div>
-      </nav>
-    </div>
+        <h1 className="mt-6 text-3xl font-bold tracking-wide animate-fade-in text-center">
+          Bem-vindo à sua plataforma
+        </h1>
+      </div>
+    </main>
   );
 };
 
-
-
-export default AppLinksGrid;
+export default LandingPage;
