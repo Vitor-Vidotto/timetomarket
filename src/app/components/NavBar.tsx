@@ -77,7 +77,10 @@ const Navbar = () => {
             <FaCog />
             <span className="hidden group-hover:inline">Configuração</span>
           </Link>
-          <Link href="/configuracao" className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500">
+          <Link href="/kanban" className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500">
+            <FaCog />
+            <span className="hidden group-hover:inline">Kanban</span>
+          <Link href="/renomeadores" className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500">
             <FaAddressBook />
             <span className="hidden group-hover:inline">Renomeadores</span>
           </Link>
