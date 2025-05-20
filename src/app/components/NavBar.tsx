@@ -77,6 +77,10 @@ const Navbar = () => {
             <FaCog />
             <span className="hidden group-hover:inline">Configuração</span>
           </Link>
+          <Link href="/kanban" className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500">
+            <FaCog />
+            <span className="hidden group-hover:inline">Kanban</span>
+          </Link>
         </div>
 
         <button onClick={toggleTheme} className="flex items-center space-x-3 text-2xl text-black dark:text-white">
