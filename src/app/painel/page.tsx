@@ -1,10 +1,10 @@
 "use client"
 import Auth from "../components/login/Auth";
 import Navbar from "../components/NavBar";
-import PainelUserNavBar from "../components/navbars/PainelUserNavBar ";
 import AddTodo from "../components/kanban/AddTodo";
-import TodoListeditUser from "../components/kanban/TodoListEditUser"
+import TodoListedit from "../components/kanban/TodoListEditor"
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import PainelAdminNavBar from "../components/navbars/PainelAdmNavBar";
 
 
 
@@ -20,10 +20,10 @@ export default function Home() {
       <Auth />
       <main className="flex flex-col gap-8 items-center sm:items-start">
         <Navbar />
-        <PainelUserNavBar />
+        <PainelAdminNavBar />
         <ChakraProvider theme={theme} >
         <AddTodo />
-        <TodoListeditUser />
+        <TodoListedit />
         </ChakraProvider>
       </main>
     </div>

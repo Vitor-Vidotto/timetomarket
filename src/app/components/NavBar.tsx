@@ -80,6 +80,7 @@ const Navbar = () => {
           <Link href="/kanban" className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500">
             <FaCog />
             <span className="hidden group-hover:inline">Kanban</span>
+            </Link>
           <Link href="/renomeadores" className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500">
             <FaAddressBook />
             <span className="hidden group-hover:inline">Renomeadores</span>
