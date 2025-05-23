@@ -6,7 +6,26 @@ import {
   useToast,
   Badge,
 } from "@chakra-ui/react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
+import { 
+  DndContext, 
+  closestCenter, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragOverlay,
+} from "@dnd-kit/core";
+import { DroppableColumn } from "./droppablecolumn"; // onde você salvar o arquivo
+
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+} from "@dnd-kit/sortable";
+
+import { CSS } from '@dnd-kit/utilities';
+
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import { deleteTodo, toggleTodoStatus } from "../../api/send/todo";
@@ -22,33 +41,6 @@ const statusColumns = [
   "Homologação",
 ];
 
-
-const TodoListeditUser = () => {
-  const [todos, setTodos] = useState([]);
-  const [editingTask, setEditingTask] = useState(null);
-  const { user } = useAuth();
-  const toast = useToast();
-  const [searchText, setSearchText] = useState("");
-
-  useEffect(() => {
-    if (!user) return;
-
-    const q = query(collection(db, "todo"), where("user", "==", user.uid));
-
-    onSnapshot(q, (querySnapshot) => {
-      let ar = [];
-      querySnapshot.docs.forEach((doc) => {
-        ar.push({ id: doc.id, ...doc.data() });
-      });
-      setTodos(ar);
-    });
-  }, [user]);
-
-  const filteredTodos = todos.filter((todo) =>
-    todo.title.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  // mapeamento no topo
 const statusColors = {
   "Não Lançado": "gray.100",
   "Encerrado": "green.100",
@@ -57,20 +49,98 @@ const statusColors = {
   "Homologação": "blue.100",
 };
 
+function SortableItem({ todo, onDelete, onEdit }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: todo.id });
 
-  const onDragEnd = async (result) => {
-    const { source, destination, draggableId } = result;
-    if (!destination) return;
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: "white",
+    padding: "12px",
+    marginBottom: "8px",
+    borderRadius: "6px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+    color: "black",
+  };
 
-    const movedTodo = todos.find((todo) => todo.id === draggableId);
-    if (movedTodo && movedTodo.status !== destination.droppableId) {
-      await toggleTodoStatus({ docId: draggableId, status: destination.droppableId });
-      toast({
-        title: `Movido para ${destination.droppableId}`,
-        status: "info",
+  return (
+    <Box ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <Text fontWeight="bold">{todo.title}</Text>
+      <Text fontSize="sm">{todo.description}</Text>
+      <Box mt={2} display="flex" gap={2}>
+        <Badge colorScheme="red" cursor="pointer" onClick={() => onDelete(todo.id)}>
+          <FaTrash />
+        </Badge>
+        <Badge colorScheme="green" cursor="pointer" onClick={() => onEdit(todo)}>
+          <FaEdit />
+        </Badge>
+      </Box>
+    </Box>
+  );
+}
+
+const TodoListeditUser = () => {
+  const [todos, setTodos] = useState([]);
+  const [editingTask, setEditingTask] = useState(null);
+  const { user } = useAuth();
+  const toast = useToast();
+  const [searchText, setSearchText] = useState("");
+  const [activeId, setActiveId] = useState(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const q = query(collection(db, "todo"), where("user", "==", user.uid));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let ar = [];
+      querySnapshot.docs.forEach((doc) => {
+        ar.push({ id: doc.id, ...doc.data() });
       });
+      setTodos(ar);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const filteredTodos = todos.filter((todo) =>
+    todo.title.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  const findColumnById = (id) => statusColumns.find((col) => col === id);
+
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
+  };
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+  
+    setActiveId(null);
+  
+    if (!over) return;
+  
+    const draggedTodo = todos.find((todo) => todo.id === active.id);
+    if (!draggedTodo) return;
+  
+    // Se o `over.id` é um dos statusColumns (nome da coluna), atualiza o status
+    if (statusColumns.includes(over.id)) {
+      const newStatus = over.id;
+  
+      if (draggedTodo.status !== newStatus) {
+        await toggleTodoStatus({ docId: draggedTodo.id, status: newStatus });
+        toast({
+          title: `Movido para ${newStatus}`,
+          status: "info",
+        });
+      }
     }
   };
+  
 
   const handleTodoDelete = async (id) => {
     if (window.confirm("Tem certeza que deseja deletar?")) {
@@ -86,67 +156,66 @@ const statusColors = {
   };
 
   return (
-    <Box>
+    <Box data-tauri-drag-region>
       <Input
         placeholder="Buscar tarefa"
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
         mb={4}
       />
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Box display="flex" gap={4} overflowX="auto">
-        {statusColumns.map((status) => (
-  <Droppable droppableId={status} key={status}>
-    {(provided) => (
-      <Box
-        ref={provided.innerRef}
-        {...provided.droppableProps}
-        p={4}
-        bg={statusColors[status]} // <-- background color por status
-        minW="250px"
-        borderRadius="md"
-        color="black" // <-- texto preto
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
       >
-        <Text fontWeight="bold" mb={2}>
-          {status}
-        </Text>
-        {filteredTodos
-          .filter((todo) => todo.status === status)
-          .map((todo, index) => (
-            <Draggable draggableId={todo.id} index={index} key={todo.id}>
-              {(provided) => (
-                <Box
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                  bg="white"
-                  p={3}
-                  mb={2}
-                  borderRadius="md"
-                  boxShadow="md"
-                  color="black" // <-- texto preto nos cards
-                >
-                  <Text fontWeight="bold">{todo.title}</Text>
-                  <Text fontSize="sm">{todo.description}</Text>
-                  <Box mt={2} display="flex" gap={2}>
-                    <Badge colorScheme="red" cursor="pointer" onClick={() => handleTodoDelete(todo.id)}>
-                      <FaTrash />
-                    </Badge>
-                    <Badge colorScheme="green" cursor="pointer" onClick={() => handleEditTask(todo)}>
-                      <FaEdit />
-                    </Badge>
-                  </Box>
-                </Box>
-              )}
-            </Draggable>
-          ))}
-        {provided.placeholder}
-      </Box>
-    )}
-  </Droppable>
-))}
+        <Box display="flex" gap={4} overflowX="auto">
+        {statusColumns.map((status) => {
+  const todosInStatus = filteredTodos.filter((todo) => todo.status === status);
+
+  return (
+    <DroppableColumn
+      key={status}
+      id={status}
+      p={4}
+      bg={statusColors[status]}
+      minW="250px"
+      borderRadius="md"
+      color="black"
+    >
+      <Text fontWeight="bold" mb={2}>{status}</Text>
+      <SortableContext
+        items={todosInStatus.map((todo) => todo.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        {todosInStatus.map((todo) => (
+          <SortableItem
+            key={todo.id}
+            todo={todo}
+            onDelete={handleTodoDelete}
+            onEdit={handleEditTask}
+          />
+        ))}
+      </SortableContext>
+    </DroppableColumn>
+  );
+})}
         </Box>
-      </DragDropContext>
+
+        <DragOverlay>
+          {activeId ? (
+            <Box
+              p={3}
+              bg="white"
+              borderRadius="md"
+              boxShadow="md"
+              color="black"
+            >
+              {todos.find((todo) => todo.id === activeId)?.title || ""}
+            </Box>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       {editingTask && (
         <TaskEditor

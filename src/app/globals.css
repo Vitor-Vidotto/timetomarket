@@ -11,6 +11,7 @@
     --title-text: #121212; /* Cor do título no modo claro */
   }
   
+  
   /* Variáveis para o modo escuro */
   body.dark {
     --background: linear-gradient(to bottom right, #1f2937, #000000, #1f2937); /* gray-900 → black → gray-900 */
