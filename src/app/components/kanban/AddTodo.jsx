@@ -92,14 +92,14 @@ const AddTodo = () => {
       position={"relative"} top="5%" 
       
       >
-        Criar Painel
+        Criar Task
       </Button>
 
       {/* Modal */}
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Criar Painel</ModalHeader>
+          <ModalHeader>Criar Task</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {/* Formulário existente */}

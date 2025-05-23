@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Badge,
   Box,
-  Heading,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
+  Input,
   Text,
   useToast,
-  Input,
-  TableContainer,
+  Badge,
 } from "@chakra-ui/react";
-import styles from "./TodolistEditor.module.css";
-import useAuth from "../../hook/useAuth";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
-import { FaTrash, FaEdit } from "react-icons/fa";
 import { deleteTodo, toggleTodoStatus } from "../../api/send/todo";
+import useAuth from "../../hook/useAuth";
+import { FaTrash, FaEdit } from "react-icons/fa";
 import TaskEditor from "./TaskEditor";
-import ReactPaginate from "react-paginate";
+
+const statusColumns = [
+  "Não Lançado",
+  "Encerrado",
+  "Suspenso",
+  "Revogado",
+  "Homologação",
+];
+
 
 const TodoListeditUser = () => {
   const [todos, setTodos] = useState([]);
@@ -29,17 +29,9 @@ const TodoListeditUser = () => {
   const { user } = useAuth();
   const toast = useToast();
   const [searchText, setSearchText] = useState("");
-  const [pageNumber, setPageNumber] = useState(0);
-  const todosPerPage = 12;
 
-  const [filteredTodos, setFilteredTodos] = useState([]);
-
-  const refreshData = () => {
-    if (!user) {
-      setTodos([]);
-      setFilteredTodos([]);
-      return;
-    }
+  useEffect(() => {
+    if (!user) return;
 
     const q = query(collection(db, "todo"), where("user", "==", user.uid));
 
@@ -49,35 +41,35 @@ const TodoListeditUser = () => {
         ar.push({ id: doc.id, ...doc.data() });
       });
       setTodos(ar);
-      setFilteredTodos(ar);
-      setPageNumber(0); // reseta a página quando troca a lista
     });
-  };
-
-  useEffect(() => {
-    refreshData();
   }, [user]);
 
-  const handleSearch = (event) => {
-    const searchText = event.target.value.toLowerCase();
-    const filtered = todos.filter((todo) => {
-      return (
-        todo.title.toLowerCase().includes(searchText) ||
-        todo.displayDate.includes(searchText) ||
-        todo.executionDate.includes(searchText)
-      );
-    });
+  const filteredTodos = todos.filter((todo) =>
+    todo.title.toLowerCase().includes(searchText.toLowerCase())
+  );
 
-    setFilteredTodos(filtered);
-    setSearchText(event.target.value);
-    setPageNumber(0);
-  };
+  // mapeamento no topo
+const statusColors = {
+  "Não Lançado": "gray.100",
+  "Encerrado": "green.100",
+  "Suspenso": "yellow.100",
+  "Revogado": "red.100",
+  "Homologação": "blue.100",
+};
 
-  const pageCount = Math.ceil(filteredTodos.length / todosPerPage);
 
-  const getPaginatedData = () => {
-    const offset = pageNumber * todosPerPage;
-    return filteredTodos.slice(offset, offset + todosPerPage);
+  const onDragEnd = async (result) => {
+    const { source, destination, draggableId } = result;
+    if (!destination) return;
+
+    const movedTodo = todos.find((todo) => todo.id === draggableId);
+    if (movedTodo && movedTodo.status !== destination.droppableId) {
+      await toggleTodoStatus({ docId: draggableId, status: destination.droppableId });
+      toast({
+        title: `Movido para ${destination.droppableId}`,
+        status: "info",
+      });
+    }
   };
 
   const handleTodoDelete = async (id) => {
@@ -87,168 +79,81 @@ const TodoListeditUser = () => {
     }
   };
 
-  const handleToggle = async (id, status) => {
-    const newStatus = status === "completed" ? "pending" : "completed";
-    await toggleTodoStatus({ docId: id, status: newStatus });
-    toast({
-      title: `Todo marcado como ${newStatus}`,
-      status: newStatus === "completed" ? "success" : "warning",
-    });
-  };
-
-  const handleEditTask = (task) => {
-    setEditingTask(task);
-  };
-
-  const handleCloseEditor = () => {
-    setEditingTask(null);
-  };
-
+  const handleEditTask = (task) => setEditingTask(task);
+  const handleCloseEditor = () => setEditingTask(null);
   const handleUpdateTask = (updatedTask) => {
-    setTodos((prevTodos) => {
-      return prevTodos.map((todo) => {
-        if (todo.id === updatedTask.id) {
-          return updatedTask;
-        }
-        return todo;
-      });
-    });
-  };
-
-  const getColorForTodo = (color) => {
-    switch (color) {
-      case "blue":
-        return "#4299E1";
-      case "red":
-        return "#FC8181";
-      case "yellow":
-        return "#F2C02B";
-      case "purple":
-        return "#9F7AEA";
-      case "green":
-        return "#68D391";
-      case "white":
-        return "#C0C0C0";
-      default:
-        return "#CBD5E0";
-    }
-  };
-
-  const handlePageClick = (selectedPage) => {
-    setPageNumber(selectedPage.selected);
+    setTodos((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
   };
 
   return (
-    <Box display="flex" flexDirection="column" width="100%">
+    <Box>
       <Input
-        width="50%"
-        placeholder="Buscar"
+        placeholder="Buscar tarefa"
         value={searchText}
-        onChange={handleSearch}
+        onChange={(e) => setSearchText(e.target.value)}
         mb={4}
-        position={"relative"}
-        justifyContent="start"
-        display="flex"
       />
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Box display="flex" gap={4} overflowX="auto">
+        {statusColumns.map((status) => (
+  <Droppable droppableId={status} key={status}>
+    {(provided) => (
       <Box
-        mt={5}
-        display="relative"
-        flexDirection="column"
-        justifyContent="start"
-        maxWidth="100%"
+        ref={provided.innerRef}
+        {...provided.droppableProps}
+        p={4}
+        bg={statusColors[status]} // <-- background color por status
+        minW="250px"
+        borderRadius="md"
+        color="black" // <-- texto preto
       >
-        <TableContainer
-          display="flex"
-          flexDirection="column"
-          alignContent="center"
-          width="100%"
-          overflowX="auto"
-        >
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th>Tarefa</Th>
-                <Th>Descrição</Th>
-                <Th>Cidade</Th>
-                <Th>Empresa</Th>
-                <Th>Data de Exibição</Th>
-                <Th>Data de Realização</Th>
-                <Th>Status</Th>
-                <Th>Observação</Th>
-                <Th>Ações</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {getPaginatedData().map((todo) => (
-                <Tr bg={getColorForTodo(todo.color)} key={todo.id}>
-                  <Td>{todo.title}</Td>
-                  <Td>{todo.description}</Td>
-                  <Td>{todo.city}</Td>
-                  <Td>{todo.company}</Td>
-                  <Td>{todo.displayDate}</Td>
-                  <Td>{todo.executionDate}</Td>
-                  <Td>{todo.status}</Td>
-                  <Td>{todo.observation}</Td>
-                  <Td alignItems="center">
-                    <Box display="flex">
-                      <Badge
-                        color="red.900"
-                        transition="0.2s"
-                        _hover={{
-                          bg: "red",
-                          transform: "scale(1.2)",
-                        }}
-                        cursor="pointer"
-                        onClick={() => user && handleTodoDelete(todo.id)}
-                      >
-                        {user && <FaTrash />}
-                      </Badge>
-                      <Badge
-                        float="right"
-                        opacity="0.8"
-                        bg={"green"}
-                        ml={2}
-                        transition="0.2s"
-                        _hover={{
-                          transform: "scale(1.2)",
-                        }}
-                        cursor="pointer"
-                        onClick={() => handleEditTask(todo)}
-                      >
-                        <FaEdit />
-                      </Badge>
-                    </Box>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
+        <Text fontWeight="bold" mb={2}>
+          {status}
+        </Text>
+        {filteredTodos
+          .filter((todo) => todo.status === status)
+          .map((todo, index) => (
+            <Draggable draggableId={todo.id} index={index} key={todo.id}>
+              {(provided) => (
+                <Box
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  bg="white"
+                  p={3}
+                  mb={2}
+                  borderRadius="md"
+                  boxShadow="md"
+                  color="black" // <-- texto preto nos cards
+                >
+                  <Text fontWeight="bold">{todo.title}</Text>
+                  <Text fontSize="sm">{todo.description}</Text>
+                  <Box mt={2} display="flex" gap={2}>
+                    <Badge colorScheme="red" cursor="pointer" onClick={() => handleTodoDelete(todo.id)}>
+                      <FaTrash />
+                    </Badge>
+                    <Badge colorScheme="green" cursor="pointer" onClick={() => handleEditTask(todo)}>
+                      <FaEdit />
+                    </Badge>
+                  </Box>
+                </Box>
+              )}
+            </Draggable>
+          ))}
+        {provided.placeholder}
       </Box>
+    )}
+  </Droppable>
+))}
+        </Box>
+      </DragDropContext>
+
       {editingTask && (
         <TaskEditor
           isOpen={!!editingTask}
           onClose={handleCloseEditor}
           task={editingTask}
           onUpdateTask={handleUpdateTask}
-        />
-      )}
-      {pageCount > 1 && (
-        <ReactPaginate
-          pageCount={pageCount}
-          pageRangeDisplayed={5}
-          marginPagesDisplayed={6}
-          previousLabel={"Anterior"}
-          nextLabel={"Próxima"}
-          breakLabel={"..."}
-          onPageChange={handlePageClick}
-          containerClassName={styles.pagination}
-          activeClassName={styles.active}
-          previousClassName={styles.pagination_previous}
-          nextClassName={styles.pagination_next}
-          breakClassName={styles.pagination_break}
-          pageClassName={styles.pagination_page}
-          pageLinkClassName={styles.pagination_link}
         />
       )}
     </Box>
