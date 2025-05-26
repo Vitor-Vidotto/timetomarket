@@ -7,15 +7,15 @@ import {
   Badge,
 } from "@chakra-ui/react";
 
-import { 
-  DndContext, 
-  closestCenter, 
-  PointerSensor, 
-  useSensor, 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
   useSensors,
   DragOverlay,
 } from "@dnd-kit/core";
-import { DroppableColumn } from "./droppablecolumn"; // onde você salvar o arquivo
+import { DroppableColumn } from "./droppablecolumn";
 
 import {
   SortableContext,
@@ -34,19 +34,19 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 import TaskEditor from "./TaskEditor";
 
 const statusColumns = [
-  "Não Lançado",
-  "Encerrado",
-  "Suspenso",
-  "Revogado",
-  "Homologação",
+  "Backlog",
+  "Para fazer",
+  "Fazendo",
+  "Testando",
+  "Finalizado",
 ];
 
 const statusColors = {
-  "Não Lançado": "gray.100",
-  "Encerrado": "green.100",
-  "Suspenso": "yellow.100",
-  "Revogado": "red.100",
-  "Homologação": "blue.100",
+  "Backlog": "gray.100",
+  "Para fazer": "red.100",
+  "Fazendo": "yellow.100",
+  "Testando": "blue.100",
+  "Finalizado": "green.100",
 };
 
 function SortableItem({ todo, onDelete, onEdit }) {
@@ -67,7 +67,19 @@ function SortableItem({ todo, onDelete, onEdit }) {
   return (
     <Box ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Text fontWeight="bold">{todo.title}</Text>
-      <Text fontSize="sm">{todo.description}</Text>
+      <Text
+  fontSize="sm"
+  sx={{
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  }}
+>
+  {todo.description}
+</Text>
+
       <Box mt={2} display="flex" gap={2}>
         <Badge colorScheme="red" cursor="pointer" onClick={() => onDelete(todo.id)}>
           <FaTrash />
@@ -111,26 +123,23 @@ const TodoListeditUser = () => {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
-  const findColumnById = (id) => statusColumns.find((col) => col === id);
-
   const handleDragStart = (event) => {
     setActiveId(event.active.id);
   };
 
   const handleDragEnd = async (event) => {
     const { active, over } = event;
-  
+
     setActiveId(null);
-  
+
     if (!over) return;
-  
+
     const draggedTodo = todos.find((todo) => todo.id === active.id);
     if (!draggedTodo) return;
-  
-    // Se o `over.id` é um dos statusColumns (nome da coluna), atualiza o status
+
     if (statusColumns.includes(over.id)) {
       const newStatus = over.id;
-  
+
       if (draggedTodo.status !== newStatus) {
         await toggleTodoStatus({ docId: draggedTodo.id, status: newStatus });
         toast({
@@ -140,7 +149,6 @@ const TodoListeditUser = () => {
       }
     }
   };
-  
 
   const handleTodoDelete = async (id) => {
     if (window.confirm("Tem certeza que deseja deletar?")) {
@@ -157,50 +165,70 @@ const TodoListeditUser = () => {
 
   return (
     <Box data-tauri-drag-region>
+    
       <Input
-        placeholder="Buscar tarefa"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        mb={4}
-      />
+            placeholder="Buscar tarefa"
+            value={searchText}
+            maxWidth="250px"
+            onChange={(e) => setSearchText(e.target.value)}
+            mb={4}
+          />
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <Box display="flex" gap={4} overflowX="auto">
-        {statusColumns.map((status) => {
-  const todosInStatus = filteredTodos.filter((todo) => todo.status === status);
+  <Box overflowX="auto" w="100vw">
+  <Box
+    display="flex"
+    gap={4}
+    flexWrap="nowrap"   // Impede quebra de linha
+    minWidth={`${statusColumns.length * 250 + (statusColumns.length - 1) * 16}px`} 
+    // Largura mínima é a soma das larguras das colunas + gaps (gap 4 = 16px)
+  >
+    {statusColumns.map((status) => {
+      const todosInStatus = filteredTodos.filter((todo) => todo.status === status);
 
-  return (
-    <DroppableColumn
-      key={status}
-      id={status}
-      p={4}
-      bg={statusColors[status]}
-      minW="250px"
-      borderRadius="md"
-      color="black"
-    >
-      <Text fontWeight="bold" mb={2}>{status}</Text>
-      <SortableContext
-        items={todosInStatus.map((todo) => todo.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        {todosInStatus.map((todo) => (
-          <SortableItem
-            key={todo.id}
-            todo={todo}
-            onDelete={handleTodoDelete}
-            onEdit={handleEditTask}
-          />
-        ))}
-      </SortableContext>
-    </DroppableColumn>
-  );
-})}
+      return (
+        <Box
+          key={status}
+          minW="250px"
+          maxW="250px"
+          flexShrink={0} // Não encolhe
+        >
+          <DroppableColumn
+            id={status}
+            p={4}
+            bg={statusColors[status]}
+            borderRadius="md"
+            color="black"
+            minHeight="300px"
+          >
+            <Text fontWeight="bold" mb={2}>{status}</Text>
+            <SortableContext
+              items={todosInStatus.map((todo) => todo.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {todosInStatus.map((todo) => (
+                <SortableItem
+                  key={todo.id}
+                  todo={todo}
+                  onDelete={handleTodoDelete}
+                  onEdit={handleEditTask}
+                />
+              ))}
+            </SortableContext>
+          </DroppableColumn>
         </Box>
+      );
+    })}
+  </Box>
+</Box>
+
+
+
+
 
         <DragOverlay>
           {activeId ? (

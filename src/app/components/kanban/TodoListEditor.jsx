@@ -46,6 +46,7 @@ const TodoListedit = () => {
     });
   };
 
+  
   useEffect(() => {
     refreshData();
   }, [user]);
@@ -94,6 +95,7 @@ const TodoListedit = () => {
   const handleCloseEditor = () => {
     setEditingTask(null);
   };
+ 
 
   const handleUpdateTask = (updatedTask) => {
     setTodos((prevTodos) => {
@@ -174,13 +176,9 @@ const TodoListedit = () => {
           <Tr>
             <Th>Tarefa</Th>
             <Th>Descrição</Th>
-            <Th>Cidade</Th>
-            <Th>Empresa</Th>
-            <Th>Data de Exibição</Th>
-            <Th>Data de Realização</Th>
             <Th>Status</Th>
+            <Th>Data de Realização</Th>
             <Th>Observação</Th>
-            <Th>Ações</Th>
           </Tr>
         </Thead>
         <Tbody
@@ -189,11 +187,8 @@ const TodoListedit = () => {
             <Tr bg={getColorForTodo(todo.color)} key={todo.id}>
               <Td>{todo.title}</Td>
               <Td>{todo.description}</Td>
-              <Td>{todo.city}</Td>
-              <Td>{todo.company}</Td>
-              <Td>{todo.displayDate}</Td>
-              <Td>{todo.executionDate}</Td>
               <Td>{todo.status}</Td>
+              <Td>{todo.displayDate}</Td>
               <Td>{todo.observation}</Td>
               <Td alignItems="center">
                 <Box display="flex">

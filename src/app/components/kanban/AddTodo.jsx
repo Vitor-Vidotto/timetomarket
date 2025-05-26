@@ -24,14 +24,10 @@ const AddTodo = () => {
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar a exibição do modal
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("Não Lançado");
-  const [city, setCity] = useState(""); // Novo campo: Cidade
-  const [company, setCompany] = useState(""); // Novo campo: Empresa
+  const [status, setStatus] = useState("Backlog");
   const [displayDate, setDisplayDate] = useState(""); // Novo campo: Data de Exibição
-  const [executionDate, setExecutionDate] = useState(""); // Novo campo: Data de Realização
   const [observation, setObservation] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [color, setColor] = useState("blue");
 
   const toast = useToast();
   const { isLoggedIn, user } = useAuth();
@@ -54,14 +50,11 @@ const AddTodo = () => {
       description,
       status,
       userId: user.uid,
-      city,
-      company,
       displayDate,
-      executionDate,
       observation,
-      color,
+      userEmail: user.email, // <- Adiciona o e-mail aqui
     };
-
+    
     try {
       // Chame a função addTodo para adicionar a tarefa ao Firebase
       await addTodo(todo);
@@ -69,13 +62,9 @@ const AddTodo = () => {
       setIsOpen(false); // Fecha o modal após a criação da tarefa
       setTitle("");
       setDescription("");
-      setStatus("Não Lançado");
-      setCity("");
-      setCompany("");
+      setStatus("Backlog");
       setDisplayDate("");
-      setExecutionDate("");
       setObservation("");
-      setColor("blue");
 
       toast({ title: "Todo created successfully", status: "success" });
     } catch (error) {
@@ -115,36 +104,22 @@ const AddTodo = () => {
                 onChange={(e) => setDescription(e.target.value)}
               />
               <Select value={status} onChange={(e) => setStatus(e.target.value)}>
-                <option value={"Não Lançado"} style={{ color: "white", fontWeight: "bold" }}>
-                  Não Lançado
+                <option value={"Backlog"} style={{ color: "white", fontWeight: "bold" }}>
+                  Backlog
                 </option>
-                <option value={"Encerrado"} style={{ color: "white", fontWeight: "bold" }}>
-                  Encerrado
-                </option><option value={"Suspenso"} style={{ color: "white", fontWeight: "bold" }}>
-                  Suspenso
+                <option value={"Para fazer"} style={{ color: "white", fontWeight: "bold" }}>
+                  Para fazer
+                </option><option value={"Fazendo"} style={{ color: "white", fontWeight: "bold" }}>
+                  Fazendo
                 </option>
-                <option value={"Revogado"} style={{ color: "white", fontWeight: "bold" }}>
-                 Revogado
+                <option value={"Testando"} style={{ color: "white", fontWeight: "bold" }}>
+                 Testando
                 </option>
-                <option value={"Homologação"} style={{ color: "white", fontWeight: "bold" }}>
-                 Homologação
+                <option value={"Finalizado"} style={{ color: "white", fontWeight: "bold" }}>
+                 Finalizado
                 </option>
 
               </Select>
-
-              {/* Novos campos adicionais */}
-              <Input
-              maxLength={32}
-                placeholder="Cidade Exibida"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
-              <Input
-              maxLength={12}
-                placeholder="Compania Exibida"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-              />
               <Input
   type="date" // Set the input type to date
   placeholder="Data"
@@ -152,36 +127,13 @@ const AddTodo = () => {
   onChange={(e) => setDisplayDate(e.target.value)}
 />
 
-<Input
-  type="text" // Set the input type to date
-  placeholder="Data de Realização Exibida"
-  value={executionDate}
-  onChange={(e) => setExecutionDate(e.target.value)}
-/>
+
+
                 <Input
                 placeholder="Observação"
                 value={observation}
                 onChange={(e) => setObservation(e.target.value)}
               />
-              <RadioGroup value={color} onChange={(e) => setColor(e)}>
-                <Stack direction="row">
-                  <Radio value="blue" colorScheme="blue">
-                    Azul
-                  </Radio>
-                  <Radio value="red" colorScheme="red">
-                    Vermelho
-                  </Radio>
-                  <Radio value="yellow" colorScheme="yellow">
-                    Amarelo
-                  </Radio>
-                  <Radio value="green" colorScheme="green">
-                    Verde
-                  </Radio>
-                  <Radio value="white" colorScheme="white">
-                Cinza
-              </Radio>
-                </Stack>
-              </RadioGroup>
             </Stack>
           </ModalBody>
           <ModalFooter>
