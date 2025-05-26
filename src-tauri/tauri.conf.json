@@ -13,8 +13,9 @@
     "windows": [
       {
         "title": "Time To Market",  
-        "width": 900,
-        "height": 800,
+        "dragDropEnabled": false,
+        "width": 1200,
+        "height": 900,
         "resizable": true,
         "fullscreen": false,
         "url":  "http://localhost:3000",
@@ -23,15 +24,25 @@
       },
       {
         "title": "Time To Market", 
-        "width": 900,
-        "height": 800,
+        "width": 1200,
+        "height": 900,
         "url": "splash.html",
+        "dragDropEnabled": false,
         "label": "splashscreen",
         "visible": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "draggable-window",
+          "windows": [
+            "*"
+          ],
+          "permissions": [
+            "core:window:allow-start-dragging"
+          ]}]
     }
   },
   "bundle": {
