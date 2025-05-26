@@ -48,11 +48,6 @@ export default function LoginForm() {
         >
             <Container maxW="lg">
                 <Stack spacing="8">
-                    <Stack spacing="6">
-                        <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
-                            <Heading size={{ base: 'xs', md: 'sm' }}>Login</Heading>
-                        </Stack>
-                    </Stack>
                     <Box
                         py={{ base: '0', sm: '8' }}
                         px={{ base: '4', sm: '10' }}
@@ -60,17 +55,22 @@ export default function LoginForm() {
                         boxShadow="lg"
                         borderRadius="xl"
                     >
+                    <Stack spacing="6">
+                        <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
+                            <Heading size={{ base: 'xs', md: 'sm' }}>Login</Heading>
+                        </Stack>
+                    </Stack>
                         <form onSubmit={(e) => e.preventDefault()}>
                             <Stack spacing="6">
                                 <Stack spacing="5">
                                     <FormControl>
                                         <FormLabel color={"Black"} htmlFor="email">E-mail</FormLabel>
                                         <Input required
-                                            className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
+                                            className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-900 text-sm rounded-lg block w-full p-2.5"
                                             placeholder="seu@email.com" data-testid="email-input" id="email" type="email" ref={emailRef} />
                                     </FormControl>
                                     <PasswordField data-testid="senha-input" ref={passRef} required
-                                        className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 text-sm rounded-lg block w-full p-2.5"
+                                        className="bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-900 text-sm rounded-lg block w-full p-2.5"
                                         placeholder="Senha" />
                                 </Stack>
                                 <Stack spacing="6">

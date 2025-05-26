@@ -88,22 +88,24 @@ const AddTodo = () => {
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Criar Task</ModalHeader>
+          <ModalHeader className=" text-gray-900 text-sm rounded-lg block w-full p-2.5">Criar Task</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {/* Formulário existente */}
             <Stack direction="column">
               <Input
+              className=" text-gray-900 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Titulo"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
               <Textarea
                 placeholder="Descrição"
+                className=" text-gray-900 text-sm rounded-lg block w-full p-2.5"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <Select value={status} onChange={(e) => setStatus(e.target.value)}>
+              <Select className=" text-gray-900 text-sm rounded-lg block w-full p-2.5" value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value={"Backlog"} style={{ color: "white", fontWeight: "bold" }}>
                   Backlog
                 </option>
@@ -121,6 +123,7 @@ const AddTodo = () => {
 
               </Select>
               <Input
+              className=" text-gray-900 text-sm rounded-lg block w-full p-2.5"
   type="date" // Set the input type to date
   placeholder="Data"
   value={displayDate}
@@ -130,6 +133,7 @@ const AddTodo = () => {
 
 
                 <Input
+                className=" text-gray-900 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Observação"
                 value={observation}
                 onChange={(e) => setObservation(e.target.value)}

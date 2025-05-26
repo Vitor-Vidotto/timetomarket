@@ -14,26 +14,12 @@ import {
   Select,
   useToast,
 } from "@chakra-ui/react";
-import { toggleTodoStatus, updateTodo } from "../../api/send/todo";
-import { getAllUserEmails } from "../../api/send/getalluseremails";
+import { updateTodo } from "../../api/send/todo";
 
-const TaskEditor = ({ isOpen, onClose, task, onUpdateTask, isAdmin }) => {
+const TaskEditor = ({ isOpen, onClose, task, onUpdateTask }) => {
   const toast = useToast();
   const [editedTask, setEditedTask] = useState({ ...task });
-  const [userEmails, setUserEmails] = useState([]);
 
-  // Carregar todos os usuários com id e email ao abrir modal, se for admin
-  useEffect(() => {
-    if (isAdmin && isOpen) {
-      getAllUserEmails()
-        .then(setUserEmails)
-        .catch((error) => {
-          console.error("Erro ao buscar usuários:", error);
-        });
-    }
-  }, [isAdmin, isOpen]);
-
-  // Quando a task muda, inicializa o estado local da task, incluindo userId e userEmail
   useEffect(() => {
     setEditedTask({
       ...task,
@@ -41,21 +27,6 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask, isAdmin }) => {
       userEmail: task.userEmail || "",
     });
   }, [task]);
-
-  const handleStatusToggle = async () => {
-    const newStatus = editedTask.status === "completed" ? "pending" : "completed";
-    try {
-      await toggleTodoStatus({ docId: task.id, status: newStatus });
-      toast({
-        title: `Task marcada como ${newStatus}`,
-        status: newStatus === "completed" ? "success" : "warning",
-      });
-      setEditedTask({ ...editedTask, status: newStatus });
-      onUpdateTask({ ...editedTask, status: newStatus });
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleSaveChanges = async () => {
     try {
@@ -80,12 +51,13 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask, isAdmin }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Editar Task</ModalHeader>
+        <ModalHeader className=" text-gray-900 text-sm rounded-lg block w-full p-2.5">Editar Task</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Stack direction="column" spacing={4}>
             <Input
               placeholder="Título"
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               value={editedTask.title}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, title: e.target.value })
@@ -94,11 +66,13 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask, isAdmin }) => {
             <Textarea
               placeholder="Descrição"
               value={editedTask.description}
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               onChange={(e) =>
                 setEditedTask({ ...editedTask, description: e.target.value })
               }
             />
             <Select
+            className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               value={editedTask.status}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, status: e.target.value })
@@ -113,6 +87,7 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask, isAdmin }) => {
             <Input
               type="date"
               placeholder="Data"
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               value={editedTask.displayDate}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, displayDate: e.target.value })
@@ -120,43 +95,12 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask, isAdmin }) => {
             />
             <Input
               placeholder="Observação"
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               value={editedTask.observation}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, observation: e.target.value })
               }
             />
-
-            {/* Campo para trocar usuário responsável */}
-            {isAdmin ? (
-              <Select
-                placeholder="Selecione um usuário"
-                value={editedTask.userId || ""}
-                onChange={(e) => {
-                  const selectedUserId = e.target.value;
-                  // Encontra o email do usuário selecionado para atualizar também
-                  const selectedUser = userEmails.find(
-                    (user) => user.id === selectedUserId
-                  );
-                  setEditedTask({
-                    ...editedTask,
-                    userId: selectedUserId,
-                    userEmail: selectedUser?.email || "",
-                  });
-                }}
-              >
-                {userEmails.map(({ id, email }) => (
-                  <option key={id} value={id}>
-                    {email}
-                  </option>
-                ))}
-              </Select>
-            ) : (
-              <Input
-                placeholder="Usuário responsável"
-                value={editedTask.userEmail || ""}
-                isReadOnly
-              />
-            )}
           </Stack>
         </ModalBody>
         <ModalFooter>
@@ -164,8 +108,9 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask, isAdmin }) => {
             Fechar
           </Button>
           <Button colorScheme="teal" onClick={handleSaveChanges}>
-            Salvar
-          </Button>
+  Salvar
+</Button>
+
         </ModalFooter>
       </ModalContent>
     </Modal>
