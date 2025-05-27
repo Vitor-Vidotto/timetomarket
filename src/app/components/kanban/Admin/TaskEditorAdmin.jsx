@@ -14,11 +14,14 @@ import {
   Select,
   useToast,
 } from "@chakra-ui/react";
-import { updateTodo } from "../../api/send/todo";
+import { updateTodo } from "../../../api/send/todo";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase";
 
-const TaskEditor = ({ isOpen, onClose, task, onUpdateTask }) => {
+const TaskEditorAdmin = ({ isOpen, onClose, task, onUpdateTask }) => {
   const toast = useToast();
   const [editedTask, setEditedTask] = useState({ ...task });
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     setEditedTask({
@@ -27,6 +30,21 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask }) => {
       userEmail: task.userEmail || "",
     });
   }, [task]);
+
+  // Busca todos os usuários do Firestore
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const userList = querySnapshot.docs.map((doc) => doc.data());
+        setUsers(userList);
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleSaveChanges = async () => {
     try {
@@ -51,32 +69,50 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader className=" text-gray-900 text-sm rounded-lg block w-full p-2.5">Editar Task</ModalHeader>
+        <ModalHeader className=" text-gray-900 text-sm rounded-lg block w-full p-2.5">
+          Editar Task (Admin)
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Stack direction="column" spacing={4}>
+            {/* Select para trocar o e-mail do usuário */}
+            <Select
+              placeholder="Selecionar usuário"
+              value={editedTask.userEmail}
+              onChange={(e) =>
+                setEditedTask({ ...editedTask, userEmail: e.target.value })
+              }
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
+            >
+              {users.map((user, idx) => (
+                <option key={idx} value={user.userEmail}>
+                  {user.userEmail}
+                </option>
+              ))}
+            </Select>
+
             <Input
               placeholder="Título"
-              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               value={editedTask.title}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, title: e.target.value })
               }
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
             />
             <Textarea
               placeholder="Descrição"
               value={editedTask.description}
-              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               onChange={(e) =>
                 setEditedTask({ ...editedTask, description: e.target.value })
               }
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
             />
             <Select
-            className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               value={editedTask.status}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, status: e.target.value })
               }
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
             >
               <option value="Backlog">Backlog</option>
               <option value="Para fazer">Para fazer</option>
@@ -87,19 +123,19 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask }) => {
             <Input
               type="date"
               placeholder="Data"
-              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               value={editedTask.displayDate}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, displayDate: e.target.value })
               }
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
             />
             <Input
               placeholder="Observação"
-              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
               value={editedTask.observation}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, observation: e.target.value })
               }
+              className="bg-[#18191E] border border-[#33353F] text-gray-900 text-sm rounded-lg block w-full p-2.5"
             />
           </Stack>
         </ModalBody>
@@ -108,13 +144,12 @@ const TaskEditor = ({ isOpen, onClose, task, onUpdateTask }) => {
             Fechar
           </Button>
           <Button colorScheme="teal" onClick={handleSaveChanges}>
-  Salvar
-</Button>
-
+            Salvar
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
   );
 };
 
-export default TaskEditor;
+export default TaskEditorAdmin;

@@ -17,24 +17,23 @@ const updateTodo = async (docId, updatedData) => {
   }
 };
 
-const addTodo = async ({ userId, title, description, status, city, company, displayDate, executionDate, color, observation }) => {
+const addTodo = async ({ userId, userEmail, title, description, status, city, company, displayDate, executionDate, color, observation }) => {
   try {
     await addDoc(collection(db, "todo"), {
       user: userId,
+      userEmail: userEmail, 
       title: title,
       description: description,
       status: status,
-      city: city, // Inclui o campo cidade
-      company: company, // Inclui o campo empresa
-      displayDate: displayDate, // Inclui o campo Data de Exibição
-      executionDate: executionDate, // Inclui o campo Data de Realização
-      color: color,
+      displayDate: displayDate,
       observation: observation,
       createdAt: new Date().getTime(),
     });
-  } catch (err) {}
+  } catch (err) {
+    console.error("Error adding todo:", err);
+    throw err;
+  }
 };
-
 const toggleTodoStatus = async ({ docId, status }) => {
   try {
     const todoRef = doc(db, "todo", docId);
