@@ -48,6 +48,22 @@ const statusColors = {
   "Testando": "blue.100",
   "Finalizado": "green.100",
 };
+export function prioritizeColumnCollision(args) {
+  const { droppableContainers, collisionRect } = args;
+
+  // Filtra todas as colunas visíveis (com bounding box)
+  const columnContainers = droppableContainers.filter(container =>
+    statusColumns.includes(container.id)
+  );
+
+  // Se alguma coluna for detectada como colisão, retorna ela
+  if (columnContainers.length > 0) {
+    return closestCenter({ ...args, droppableContainers: columnContainers });
+  }
+
+  // Se nenhuma coluna estiver colidindo (ex: coluna vazia sem bounding box), tenta com tudo
+  return closestCenter(args);
+}
 
 function SortableItem({ todo, onDelete, onEdit }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: todo.id });
@@ -174,11 +190,11 @@ const TodoListeditUser = () => {
             mb={4}
           />
       <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
+  sensors={sensors}
+  collisionDetection={prioritizeColumnCollision}
+  onDragStart={handleDragStart}
+  onDragEnd={handleDragEnd}
+>
   <Box overflowX="auto" w="100vw">
   <Box
     display="flex"
@@ -198,13 +214,16 @@ const TodoListeditUser = () => {
           flexShrink={0} // Não encolhe
         >
           <DroppableColumn
-            id={status}
-            p={4}
-            bg={statusColors[status]}
-            borderRadius="md"
-            color="black"
-            minHeight="300px"
-          >
+  id={status}
+  p={4}
+  bg={statusColors[status]}
+  borderRadius="md"
+  color="black"
+  minHeight="300px" // já tem
+  display="flex"
+  flexDirection="column"
+  justifyContent="flex-start" // garante que os filhos fiquem no topo
+>
             <Text fontWeight="bold" mb={2}>{status}</Text>
             <SortableContext
               items={todosInStatus.map((todo) => todo.id)}
