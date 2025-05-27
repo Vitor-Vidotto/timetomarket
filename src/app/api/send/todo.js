@@ -21,7 +21,7 @@ const addTodo = async ({ userId, userEmail, title, description, status, city, co
   try {
     await addDoc(collection(db, "todo"), {
       user: userId,
-      userEmail: userEmail, // 👈 Aqui você adiciona o e-mail
+      userEmail: userEmail, 
       title: title,
       description: description,
       status: status,

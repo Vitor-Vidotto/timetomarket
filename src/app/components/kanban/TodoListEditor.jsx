@@ -20,7 +20,7 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "../../firebase";
 import { FaToggleOff, FaToggleOn, FaTrash, FaEdit } from "react-icons/fa";
 import { deleteTodo, toggleTodoStatus } from "../../api/send/todo";
-import TaskEditor from "./TaskEditor";
+import TaskEditorAdmin from "./Admin/TaskEditorAdmin";
 import ReactPaginate from "react-paginate";
 
 const TodoListedit = () => {
@@ -52,18 +52,22 @@ const TodoListedit = () => {
   }, [user]);
 
   const handleSearch = (event) => {
-    const searchText = event.target.value.toLowerCase();
+    const text = event.target.value.toLowerCase();
+    setSearchText(event.target.value);
+  
     const filtered = todos.filter((todo) => {
       return (
-        todo.title.toLowerCase().includes(searchText) ||
-        todo.displayDate.includes(searchText) ||
-        todo.executionDate.includes(searchText)
+        todo.userEmail?.toLowerCase().includes(text) ||
+        todo.title?.toLowerCase().includes(text) ||
+        todo.description?.toLowerCase().includes(text) ||
+        todo.status?.toLowerCase().includes(text) ||
+        todo.displayDate?.toLowerCase().includes(text)
       );
     });
-
+  
     setFilteredTodos(filtered);
-    setSearchText(event.target.value);
   };
+  
 
   const pageCount = Math.ceil(filteredTodos.length / todosPerPage);
 
@@ -77,15 +81,6 @@ const TodoListedit = () => {
       deleteTodo(id);
       toast({ title: "Deletado com Sucesso!", status: "success" });
     }
-  };
-
-  const handleToggle = async (id, status) => {
-    const newStatus = status === "completed" ? "pending" : "completed";
-    await toggleTodoStatus({ docId: id, status: newStatus });
-    toast({
-      title: `Todo marked ${newStatus}`,
-      status: newStatus === "completed" ? "success" : "warning",
-    });
   };
 
   const handleEditTask = (task) => {
@@ -108,43 +103,18 @@ const TodoListedit = () => {
     });
   };
 
-  const getColorForTodo = (color) => {
-    switch (color) {
-      case "blue":
-        return "#4299E1";
-      case "red":
-        return "#FC8181";
-      case "yellow":
-        return "#F2C02B";
-      case "purple":
-        return "#9F7AEA";
-      case "green":
-        return "#68D391";
-      case "white":
-        return "#C0C0C0";
-      default:
-        return "#CBD5E0";
-    }
+  const statusColors = {
+    "Backlog": "gray.100",
+    "Para fazer": "red.100",
+    "Fazendo": "yellow.100",
+    "Testando": "blue.100",
+    "Finalizado": "green.100",
   };
-
-  const getDarkerColorForTodo = (color) => {
-    switch (color) {
-      case "blue":
-        return "#256FAC";
-      case "red":
-        return "#D14D4D";
-      case "yellow":
-        return "#F39D36";
-      case "purple":
-        return "#7A5CC7";
-      case "green":
-        return "#4BAA7D";
-      case "white":
-        return "#A0A0A0";
-      default:
-        return "#9CAAC4";
-    }
+  
+  const getColorByStatus = (status) => {
+    return statusColors[status] || "gray.50";
   };
+  
 
   const handlePageClick = (selectedPage) => {
     setPageNumber(selectedPage.selected);
@@ -152,16 +122,14 @@ const TodoListedit = () => {
 
   return (
     <Box  display="flex" flexDirection="column" width="100%">
-      <Input
-      width="50%"
-        placeholder="Buscar"
-        value={searchText}
-        onChange={handleSearch}
-        mb={4}
-        position={"relative"} 
-        justifyContent="start"
-        display="flex"
-      />
+     <Input
+  placeholder="Buscar tarefa"
+  value={searchText}
+  maxWidth="250px"
+  onChange={handleSearch}
+  mb={4}
+/>
+
     <Box
     mt={5} display="relative" flexDirection="column"
     justifyContent="start" maxWidth="100%"
@@ -176,6 +144,7 @@ const TodoListedit = () => {
           <Tr>
             <Th>Tarefa</Th>
             <Th>Descrição</Th>
+            <Th>Email</Th>
             <Th>Status</Th>
             <Th>Data de Realização</Th>
             <Th>Observação</Th>
@@ -184,9 +153,11 @@ const TodoListedit = () => {
         <Tbody
         >
           {getPaginatedData().map((todo) => (
-            <Tr bg={getColorForTodo(todo.color)} key={todo.id}>
+            <Tr bg={getColorByStatus(todo.status)} key={todo.id} color="black">
+
               <Td>{todo.title}</Td>
               <Td>{todo.description}</Td>
+              <Td>{todo.userEmail}</Td>
               <Td>{todo.status}</Td>
               <Td>{todo.displayDate}</Td>
               <Td>{todo.observation}</Td>
@@ -228,7 +199,7 @@ const TodoListedit = () => {
       </TableContainer>
       </Box>
       {editingTask && (
-        <TaskEditor
+        <TaskEditorAdmin
         isOpen={!!editingTask}
           onClose={handleCloseEditor}
           task={editingTask}

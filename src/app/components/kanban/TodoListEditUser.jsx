@@ -103,7 +103,7 @@ const TodoListeditUser = () => {
   useEffect(() => {
     if (!user) return;
 
-    const q = query(collection(db, "todo"), where("user", "==", user.uid));
+    const q = query(collection(db, "todo"), where("userEmail", "==", user.email));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let ar = [];
       querySnapshot.docs.forEach((doc) => {
