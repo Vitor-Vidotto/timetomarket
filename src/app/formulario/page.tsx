@@ -1,6 +1,6 @@
 "use client"
 
-import FormsAutomatiza from "../components/forms/form";
+import MVPForm from "../components/forms/form";
 import Navbar from "../components/NavBar";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
       <main className="flex flex-col gap-8 items-center sm:items-start">
       <Navbar />
       <div>
-        <FormsAutomatiza />
+        <MVPForm />
       </div>
       </main>
     </div>

@@ -1,51 +1,52 @@
 import { useEffect, useState } from "react";
-import { auth, db } from "../firebase"; 
-import { useRouter } from 'next/navigation'; 
-import { addConfig, checkUserExistence, getUserRole } from "./addUser";
+import { auth } from "../firebase"; 
+import { checkUserExistence, getUserRole, addConfig } from "./addUser";
+import { useRouter, usePathname } from "next/navigation";
 
 const useAuth = () => {
-    const [user, setUser] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false)
-    const [redirected, setRedirected] = useState(false);
-    const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
-            setUser(authUser);
-            if (!authUser && !redirected) {
-                setRedirected(true);
-                router.push("/login");
-            } else {
-                try {
-                    const configExists = await checkUserExistence(authUser.uid);
-                    if(!configExists){
+  const router = useRouter();
+  const pathname = usePathname(); // pega a rota atual
 
-                        await addConfig({
-                            userId: authUser.uid, 
-                            userEmail: authUser.email,
-                            userRole: "user"
-                        });
-                        return
-                    }
-                    const userRole = await getUserRole(authUser.uid);
-                    if (userRole === "admin") {
-                        setIsAdmin(true);
-                        router.push("/painel")
-                    } else {
-                        setIsAdmin(false);
-                        router.push("/kanban")
-                    }
-                } catch (error) {
-                    console.error("Error adding config:", error);
-                }
-            }
-        });
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
+      setUser(authUser);
 
-        return () => unsubscribe();
-    }, [redirected, router]);
+      // Permitir acesso livre à rota inicial (/)
+      if (!authUser && pathname !== "/") {
+        router.push("/login");
+        setIsLoading(false);
+        return;
+      }
 
-    return { user, isAdmin, isLoggedIn: !!user };
+      if (authUser) {
+        try {
+          const configExists = await checkUserExistence(authUser.uid);
+          if (!configExists) {
+            await addConfig({
+              userId: authUser.uid,
+              userEmail: authUser.email,
+              userRole: "user",
+            });
+          }
 
+          const userRole = await getUserRole(authUser.uid);
+          setIsAdmin(userRole === "admin");
+        } catch (error) {
+          console.error("Erro ao buscar configurações do usuário:", error);
+        }
+      }
+
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [pathname, router]);
+
+  return { user, isAdmin, isLoading };
 };
 
 export default useAuth;
