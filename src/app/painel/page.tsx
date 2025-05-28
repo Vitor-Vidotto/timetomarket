@@ -7,6 +7,7 @@ import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import theme from "../theme";
 import TodoListedit from "../components/kanban/TodoListEditor"
 import PainelAdminNavBar from "../components/navbars/PainelAdmNavBar";
+import GoToForms from "../components/kanban/Admin/goToForms"
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
           <Navbar />
           <PainelAdminNavBar />
           <AddTodo />
+          <GoToForms />
           <TodoListedit />
         </main>
       </div>

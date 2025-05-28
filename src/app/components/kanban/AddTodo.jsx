@@ -124,14 +124,11 @@ const AddTodo = () => {
               </Select>
               <Input
               className=" text-gray-900 text-sm rounded-lg block w-full p-2.5"
-  type="date" // Set the input type to date
-  placeholder="Data"
-  value={displayDate}
-  onChange={(e) => setDisplayDate(e.target.value)}
-/>
-
-
-
+              type="date" // Set the input type to date
+              placeholder="Data"
+              value={displayDate}
+              onChange={(e) => setDisplayDate(e.target.value)}
+              />
                 <Input
                 className=" text-gray-900 text-sm rounded-lg block w-full p-2.5"
                 placeholder="Observação"

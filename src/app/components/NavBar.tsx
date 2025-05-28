@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { FaQuestionCircle, FaCog, FaSun, FaMoon, FaAddressBook } from "react-icons/fa";
 import { usePathname } from "next/navigation";
+import KanbanRedirectButton from "../components/kanban/KanbanRedirectButton"
 import { helpMessages } from "./helpMessages";
 
 const HelpModal: React.FC<{ isOpen: boolean; onClose: () => void; message: string }> = ({ isOpen, onClose, message }) => {
@@ -77,10 +78,7 @@ const Navbar = () => {
             <FaCog />
             <span className="hidden group-hover:inline">Configuração</span>
           </Link>
-          <Link href="/kanban" className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500">
-            <FaCog />
-            <span className="hidden group-hover:inline">Kanban</span>
-            </Link>
+          <KanbanRedirectButton />
           <Link href="/renomeadores" className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500">
             <FaAddressBook />
             <span className="hidden group-hover:inline">Renomeadores</span>

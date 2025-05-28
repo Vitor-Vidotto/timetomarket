@@ -244,11 +244,6 @@ const TodoListeditUser = () => {
     })}
   </Box>
 </Box>
-
-
-
-
-
         <DragOverlay>
           {activeId ? (
             <Box

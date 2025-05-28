@@ -16,6 +16,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase'
 import { useRouter } from 'next/navigation'
 import Auth from './Auth';
+import { getUserRole } from '@/app/hook/addUser';
 
 export default function LoginForm() {
     const emailRef = useRef(null);
@@ -25,18 +26,38 @@ export default function LoginForm() {
 
     async function handleLogin() {
         try {
-            const user = await signInWithEmailAndPassword(auth, emailRef.current.value, passRef.current.value)
-            if (user) (Auth())
-        } catch (sucess) {
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                emailRef.current.value,
+                passRef.current.value
+            );
+    
+            const user = userCredential.user;
+            const role = await getUserRole(user.uid);
+    
             toast({
                 description: "Autenticado com Sucesso",
                 title: "Autenticado",
                 duration: 3000,
                 status: "success"
-            })
-
+            });
+    
+            if (role === "admin") {
+                router.push("/painel");
+            } else {
+                router.push("/kanban");
+            }
+        } catch (error) {
+            toast({
+                title: "Erro ao autenticar",
+                description: error.message || "Verifique seu e-mail e senha.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
         }
     }
+    
 
     return (
         <Box
