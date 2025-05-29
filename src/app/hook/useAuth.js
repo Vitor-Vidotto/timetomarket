@@ -46,7 +46,8 @@ const useAuth = () => {
     return () => unsubscribe();
   }, [pathname, router]);
 
-  return { user, isAdmin, isLoading };
+  return { user, isAdmin, isLoading, isLoggedIn: !!user };
+
 };
 
 export default useAuth;
