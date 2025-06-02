@@ -4,30 +4,33 @@
 
 /* Variáveis para o modo claro */
 :root {
-    --background:linear-gradient(to bottom right, #f5deb3, #dfc28e, #f5deb3); /* Cor trigo (wheat) clara */
-    --foreground: #333333; /* Cor do texto em um tom escuro suave */
-    --navbar-background: #ededed; /* Cor de fundo da navbar em tom de trigo suave */
-    --navbar-text: #121212; /* Cor do texto da navbar em tom marrom suave */
-    --title-text: #121212; /* Cor do título no modo claro */
-  }
-  
-  
-  /* Variáveis para o modo escuro */
-  body.dark {
-    --background: linear-gradient(to bottom right, #1f2937, #000000, #1f2937); /* gray-900 → black → gray-900 */
-    --foreground: #f5f5f5;
-    --navbar-background: #1a1a1a;
-    --navbar-text: #f5f5f5;
-    --title-text: #f5f5f5;
-  }
+  --background: linear-gradient(to bottom right, #f5deb3, #dfc28e, #f5deb3);
+  --foreground: #333333;
+  --navbar-background: #ededed;
+  --navbar-text: #121212;
+  --title-text: #121212;
+}
+
+/* Variáveis para o modo escuro */
+body.dark {
+  --background: linear-gradient(to bottom right, #1f2937, #000000, #1f2937);
+  --foreground: #f5f5f5;
+  --navbar-background: #1a1a1a;
+  --navbar-text: #f5f5f5;
+  --title-text: #f5f5f5;
+}
+
 /* Estilo base do body */
 body {
   color: var(--foreground);
-  background: var(--background);
+  background-image: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  transition: background-image 1s ease, color 1s ease;
 }
 
-/* Estilos da Navbar */
+/* Navbar */
 .navbar {
   background-color: var(--navbar-background);
   color: var(--navbar-text);
@@ -40,10 +43,10 @@ body {
 }
 
 .navbar .menu-link:hover {
-  color: #ffd700; /* Cor dourada ao passar o mouse */
+  color: #ffd700;
 }
 
-/* Botão de alternância de tema */
+/* Botão toggle */
 .button-toggle-theme {
   color: var(--navbar-text);
   background-color: var(--navbar-background);
@@ -55,6 +58,7 @@ body {
   background-color: var(--navbar-text);
   color: var(--navbar-background);
 }
+
 /* Transição suave para mudança de tema */
 body {
   transition: background-color 1.0s ease, color 1.0s ease;
