@@ -9,8 +9,8 @@ export default function MVPForm() {
       <Section title="1. Informações Básicas">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input className="input" placeholder="Nome do Projeto" />
-          <input className="input" placeholder="Responsável/Idealizador" />
-          <input type="date" className="input" />
+          {/* <input className="input" placeholder="Responsável/Idealizador" /> */}
+          <div>Data alvo de conclusão: <input type="date" className="input" /></div>
         </div>
       </Section>
 
@@ -18,8 +18,8 @@ export default function MVPForm() {
       <Section title="2. Problema">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input className="input" placeholder="Qual problema você identificou?" />
-          <input className="input" placeholder="Quem são os afetados?" />
-          <input className="input" placeholder="Como é resolvido atualmente?" />
+          {/* <input className="input" placeholder="Quem são os afetados?" />
+          <input className="input" placeholder="Como é resolvido atualmente?" /> */}
         </div>
       </Section>
 
@@ -27,8 +27,8 @@ export default function MVPForm() {
       <Section title="3. Solução Proposta">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input className="input" placeholder="Descreva sua solução" />
-          <input className="input" placeholder="O que torna ela diferente?" />
-          <input className="input" placeholder="Pode ser simplificada para um MVP?" />
+          {/* <input className="input" placeholder="O que torna ela diferente?" />
+          <input className="input" placeholder="Pode ser simplificada para um MVP?" /> */}
         </div>
       </Section>
 
@@ -36,8 +36,8 @@ export default function MVPForm() {
       <Section title="4. Público-Alvo">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input className="input" placeholder="Quem é o público-alvo?" />
-          <input className="input" placeholder="Onde eles estão?" />
-          <input className="input" placeholder="Como você vai alcançá-los?" />
+          {/* <input className="input" placeholder="Onde eles estão?" />
+          <input className="input" placeholder="Como você vai alcançá-los?" /> */}
         </div>
       </Section>
 
@@ -62,26 +62,26 @@ export default function MVPForm() {
       <Section title="7. Concorrência">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input className="input" placeholder="Quem são os concorrentes?" />
-          <input className="input" placeholder="O que você pode aprender com eles?" />
+          {/* <input className="input" placeholder="O que você pode aprender com eles?" /> */}
         </div>
       </Section>
 
       {/* Passo 8 */}
       <Section title="8. Recursos Necessários">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input className="input" placeholder="Quais recursos você precisa para começar?" />
+          {/* <input className="input" placeholder="Quais recursos você precisa para começar?" /> */}
           <input className="input" placeholder="Tempo e investimento disponíveis" />
         </div>
       </Section>
 
       {/* Passo 9 */}
-      <Section title="9. Próximos Passos">
+      {/* <Section title="9. Próximos Passos">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input className="input" placeholder="Passo 1" />
           <input className="input" placeholder="Passo 2" />
           <input className="input" placeholder="Passo 3" />
         </div>
-      </Section>
+      </Section> */}
     </div>
   );
 }

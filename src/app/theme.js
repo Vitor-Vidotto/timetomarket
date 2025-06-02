@@ -16,9 +16,15 @@ const styles = {
       "--navbar-text": props.colorMode === "dark" ? "#f5f5f5" : "#121212",
       "--title-text": props.colorMode === "dark" ? "#f5f5f5" : "#121212",
     },
-    body: {
-      bg: "transparent", // vai usar o --background no CSS
+    "html, body, #__next": {
+      height: "100%",
+      margin: 0,
+      padding: 0,
+      background: "var(--background)",
       color: "var(--foreground)",
+      backgroundAttachment: "fixed",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
     },
   }),
 };
