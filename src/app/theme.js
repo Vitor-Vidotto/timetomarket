@@ -10,6 +10,7 @@ const styles = {
     html: {
       minHeight: "100%",
     },
+
     body: {
       minHeight: "100%",
       margin: 0,
