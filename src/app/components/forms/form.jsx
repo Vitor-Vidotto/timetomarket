@@ -1,10 +1,12 @@
-import { Box, Input, Textarea, VStack, Heading } from "@chakra-ui/react";
-import { addTodo } from "../../api/send/todo";
 import { useState } from "react";
-import axios from "axios";
-import { toast } from "@chakra-ui/react";
+import { OpenAI } from "openai";
+import useAuth from "../../hook/useAuth";
+import { useRouter } from 'next/navigation'
+import { addTodo } from "../../api/send/todo";
 
 export default function MVPForm() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     nome: "",
     deadline: "",
@@ -23,8 +25,42 @@ export default function MVPForm() {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  const openai = new OpenAI({
+    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, // Coloque sua chave aqui TEMPORARIAMENTE para testes locais
+    dangerouslyAllowBrowser: true, // necessário para usar no client-side
+  });
+
+  const { isLoggedIn, user } = useAuth();
+
+  const handleTodoCreate = async ({ title, description, displayDate, observation }) => {
+    console.log("handleTodoCreate:", title, description, displayDate, observation)
+
+    if (!isLoggedIn) {
+      return;
+    }
+
+    const todo = {
+      title,
+      description,
+      status: "Backlog", // ou qualquer valor padrão
+      userId: user.uid,
+      displayDate,
+      observation,
+      userEmail: user.email,
+    };
+
+    try {
+      // Chame a função addTodo para adicionar a tarefa ao Firebase
+      await addTodo(todo);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSubmit = async () => {
     const dataAtual = new Date().toLocaleDateString("pt-BR");
+    console.log("Data Atual:", dataAtual)
 
     const prompt = `
 Estou desenvolvendo um produto para minha start up, o nome do projeto é ${formData.nome}, e tenho como alvo concluir ele até ${formData.deadline}, o problema identificado é ${formData.problema}, meu publico alvo é ${formData.publicoAlvo}, minha solução é ${formData.solucao}, ela tem como principais funcionalidades pensadas ${formData.func1}, ${formData.func2}, ${formData.func3} e como objetivo ${formData.objetivo}, minha condição de sucesso é ${formData.sucesso}. Tendo em mente que possuo as seguintes concorrentes ${formData.concorrentes} (pode considerar outras que você encontrar), que hoje é ${dataAtual} e que tenho de recursos ${formData.investimento}.  
@@ -33,35 +69,67 @@ CRIE UMA LISTA DETALHADA E BEM SEPARADA DE TAREFAS PARA A CONCLUSÃO DESSE PROJE
 
 '''
 ==+==
-TITLE: "",
-DESCRIPTION: "",
-TASK_DEADLINE: "",
-OBSERVATION: "",
+TITLE: "título aqui",
+DESCRIPTION: "descrição aqui",
+TASK_DEADLINE: "data aqui",
+OBSERVATION: "observação aqui",
 '''`;
 
     try {
-      const gptRes = await axios.post("/api/chatgpt", {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
       });
 
-      const tarefasText = gptRes.data.choices[0].message.content;
-      const tarefas = tarefasText.split("==+==").filter(Boolean).map((t) => {
-        const title = t.match(/TITLE:\s?"(.*?)"/)?.[1] || "";
-        const description = t.match(/DESCRIPTION:\s?"(.*?)"/)?.[1] || "";
-        const deadline = t.match(/TASK_DEADLINE:\s?"(.*?)"/)?.[1] || "";
-        const observation = t.match(/OBSERVATION:\s?"(.*?)"/)?.[1] || "";
+      const tarefasText = completion.choices[0].message.content;
 
-        return { title, description, displayDate: deadline, observation };
-      });
+      console.log("Resposta GPT: ", tarefasText)
+
+      const tarefas = tarefasText
+        .split("==+==") // Separa por delimitador
+        .filter(Boolean) // Remove entradas vazias
+        .map((t) => {
+          console.log("CHAMOUUUUUUUUUUU: ", t);
+
+          // Regex atualizada: captura chave e valor sem exigir aspas
+          const regex = /(\w+):\s*(.+)/g;
+          let match;
+          const dados = {};
+
+          while ((match = regex.exec(t)) !== null) {
+            const key = match[1];
+            const value = match[2].trim();
+            dados[key] = value;
+          }
+
+          console.log("TITLE: ", dados.TITLE);
+          console.log("DESCRIPTION: ", dados.DESCRIPTION);
+          console.log("TASK_DEADLINE: ", dados.TASK_DEADLINE);
+          console.log("OBSERVATION: ", dados.OBSERVATION);
+
+          return {
+            title: dados.TITLE || "",
+            description: dados.DESCRIPTION || "",
+            displayDate: dados.TASK_DEADLINE || "",
+            observation: dados.OBSERVATION || "",
+          };
+        });
+
+      console.log(tarefas.length)
+
+      tarefas.shift();
+      
+      console.log(tarefas.length)
 
       for (const tarefa of tarefas) {
+        console.log("Tarefa: ", tarefa)
         await handleTodoCreate(tarefa);
       }
 
-      toast({ title: "Backlog criado com sucesso!", status: "success" });
+      router.push("/painel");
     } catch (err) {
       console.error(err);
-      toast({ title: "Erro ao criar backlog", status: "error" });
     }
   };
 
@@ -205,7 +273,8 @@ OBSERVATION: "",
       </Section>
 
       <button
-        onClick={() => console.log(formData)} // depois substitua por handleSubmit
+        // onClick={() => console.log(formData)} // depois substitua por handleSubmit
+        onClick={handleSubmit}
         className="bg-green-700 text-white px-4 py-2 mt-4 rounded"
       >
         Gerar Backlog com IA
