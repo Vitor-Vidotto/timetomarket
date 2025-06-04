@@ -20,7 +20,7 @@ const LandingPage = () => {
           }`}
         >
           <Image
-            src="/images/teste.png"
+            src="/images/icon.png"
             alt="Logo da Empresa"
             width={200}
             height={200}

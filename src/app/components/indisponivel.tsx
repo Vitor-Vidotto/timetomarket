@@ -8,7 +8,7 @@ const Indisponivel = () => {
         {/* Engrenagem animada */}
 
         <nav className="w-full text-center p-8 bg-white shadow-md rounded-lg max-w-2xl">
-          <h1 className="text-4xl font-extrabold text-gray-800 mb-6">Time To Market</h1>
+          <h1 className="text-4xl font-extrabold text-gray-800 mb-6">Task Ignite</h1>
           <p className="bg-blue-400 text-white rounded-xl p-6 border-blue-600 border-l-4 shadow-sm">
             Estamos trabalhando nisso ainda, por isso a página segue
             indisponível. Por favor, retorne ao menu.
