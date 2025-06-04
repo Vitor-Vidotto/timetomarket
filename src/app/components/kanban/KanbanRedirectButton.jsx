@@ -2,7 +2,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import useAuth from "../../hook/useAuth";
-import { FaCog } from "react-icons/fa";
+import { BsKanbanFill } from "react-icons/bs";
 
 const KanbanRedirectButton = () => {
   const { user, isAdmin, isLoading } = useAuth();
@@ -25,7 +25,7 @@ const KanbanRedirectButton = () => {
       onClick={handleClick}
       className="flex items-center space-x-3 text-black dark:text-white hover:text-blue-500"
     >
-      <FaCog />
+      <BsKanbanFill />
       <span className="hidden group-hover:inline">Kanban</span>
     </button>
   );
