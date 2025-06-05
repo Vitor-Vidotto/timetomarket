@@ -164,7 +164,7 @@ const TodoListedit = () => {
               <Td>{todo.status}</Td>
               <Td>{todo.displayDate}</Td>
               <Td title={todo.observation}>
-  {todo.observation?.length > 30 ? `${todo.observation.slice(0, 30)}...` : todo.observation}
+  {todo.observation?.length > 10 ? `${todo.observation.slice(0, 10)}...` : todo.observation}
 </Td>
               <Td alignItems="center">
                 <Box display="flex">
