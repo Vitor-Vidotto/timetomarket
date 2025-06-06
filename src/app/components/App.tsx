@@ -25,6 +25,7 @@ const LandingPage = () => {
             width={200}
             height={200}
             className="drop-shadow-lg"
+             unoptimized
           />
         </div>
         <h1 className="mt-6 text-3xl font-bold tracking-wide animate-fade-in text-center">

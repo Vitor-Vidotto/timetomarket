@@ -1,9 +1,9 @@
-import useAuth from "../../hook/useAuth"
+import useAuth from "../../hook/useAuth";
 
 const Auth = () => {
     const { user } = useAuth();
 
-    return
+    return <></>; // Retorna JSX vazio ou o que for necessário
 };
 
 export default Auth;

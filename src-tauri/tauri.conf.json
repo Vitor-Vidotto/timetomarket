@@ -18,7 +18,7 @@
         "height": 900,
         "resizable": true,
         "fullscreen": false,
-        "url":  "http://localhost:3000",
+        "url":  "file///C:/Users/muril/Área de Trabalho/TCC/timetomarket/out/index.html",
         "label": "timetomarket", 
         "visible": false
       },
