@@ -7,6 +7,7 @@ import { addTodo } from "../../api/send/todo";
 export default function MVPForm() {
   const router = useRouter();
 
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
     deadline: "",
@@ -21,7 +22,6 @@ export default function MVPForm() {
     concorrentes: "",
     investimento: "",
   });
-
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -51,6 +51,7 @@ export default function MVPForm() {
 
     try {
       // Chame a função addTodo para adicionar a tarefa ao Firebase
+      setLoading(true);
       await addTodo(todo);
 
     } catch (error) {
@@ -135,11 +136,11 @@ OBSERVATION: "observação aqui",
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center text-green-700">Formulário de Idealização de MVP</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-green-700 text-black">Formulário de Idealização de MVP</h1>
 
       {/* Passo 1 */}
-      <Section title="1. Informações Básicas">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Section  title="1. Informações Básicas">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
           <input
             className="input"
             name="nome"
@@ -162,7 +163,7 @@ OBSERVATION: "observação aqui",
 
       {/* Passo 2 */}
       <Section title="2. Problema">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
           <input
             className="input"
             name="problema"
@@ -175,7 +176,7 @@ OBSERVATION: "observação aqui",
 
       {/* Passo 3 */}
       <Section title="3. Solução Proposta">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
           <input
             className="input"
             name="solucao"
@@ -188,7 +189,7 @@ OBSERVATION: "observação aqui",
 
       {/* Passo 4 */}
       <Section title="4. Público-Alvo">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
           <input
             className="input"
             name="publicoAlvo"
@@ -201,7 +202,7 @@ OBSERVATION: "observação aqui",
 
       {/* Passo 5 */}
       <Section title="5. Funcionalidades Essenciais">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-black">
           <input
             className="input"
             name="func1"
@@ -228,7 +229,7 @@ OBSERVATION: "observação aqui",
 
       {/* Passo 6 */}
       <Section title="6. Indicadores de Sucesso">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
           <input
             className="input"
             name="sucesso"
@@ -248,7 +249,7 @@ OBSERVATION: "observação aqui",
 
       {/* Passo 7 */}
       <Section title="7. Concorrência">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
           <input
             className="input"
             name="concorrentes"
@@ -261,7 +262,7 @@ OBSERVATION: "observação aqui",
 
       {/* Passo 8 */}
       <Section title="8. Recursos Necessários">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
           <input
             className="input"
             name="investimento"
@@ -279,6 +280,13 @@ OBSERVATION: "observação aqui",
       >
         Gerar Backlog com IA
       </button>
+      {loading && (
+  <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-50">
+    <div className="text-xl font-semibold text-green-700 animate-pulse">
+      Carregando...
+    </div>
+  </div>
+)}
     </div>
   );
 }
@@ -286,7 +294,7 @@ OBSERVATION: "observação aqui",
 // Componente de seção reutilizável
 function Section({ title, children }) {
   return (
-    <section className="bg-white rounded-xl border-4 border-green-700 p-6 mb-6 shadow-md">
+    <section className="bg-white rounded-xl border-4 border-green-700 p-6 mb-6 shadow-md text-black">
       <h2 className="text-xl font-semibold mb-4">{title}</h2>
       {children}
     </section>

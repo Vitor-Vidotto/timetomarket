@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Time To Market",  
+  "productName": "Task Ignite",  
   "version": "0.1.0",
   "identifier": "timetomarket",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Time To Market",  
+        "title": "Task Ignite",  
         "dragDropEnabled": false,
         "width": 1200,
         "height": 900,
@@ -23,7 +23,7 @@
         "visible": false
       },
       {
-        "title": "Time To Market", 
+        "title": "Task Ignite", 
         "width": 1200,
         "height": 900,
         "url": "splash.html",

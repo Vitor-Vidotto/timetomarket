@@ -156,11 +156,16 @@ const TodoListedit = () => {
             <Tr bg={getColorByStatus(todo.status)} key={todo.id} color="black">
 
               <Td>{todo.title}</Td>
-              <Td>{todo.description}</Td>
+              <Td title={todo.description}>
+  {todo.description?.length > 10 ? `${todo.description.slice(0, 10)}...` : todo.description}
+</Td>
+
               <Td>{todo.userEmail}</Td>
               <Td>{todo.status}</Td>
               <Td>{todo.displayDate}</Td>
-              <Td>{todo.observation}</Td>
+              <Td title={todo.observation}>
+  {todo.observation?.length > 10 ? `${todo.observation.slice(0, 10)}...` : todo.observation}
+</Td>
               <Td alignItems="center">
                 <Box display="flex">
 
