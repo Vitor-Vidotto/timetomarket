@@ -11,10 +11,11 @@ import {
   import { forwardRef, useRef } from 'react'
   import { HiEye, HiEyeOff } from 'react-icons/hi'
   
+  
   export const PasswordField = forwardRef((props, ref) => {
     const { isOpen, onToggle } = useDisclosure()
-    const inputRef = useRef(null)
-  
+  const inputRef = useRef<HTMLInputElement>(null)
+
     const mergeRef = useMergeRefs(inputRef, ref)
     const onClickReveal = () => {
       onToggle()

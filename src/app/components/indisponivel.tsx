@@ -22,6 +22,7 @@ const Indisponivel = () => {
             className="h-20 w-20"
             width={20}
             height={20}
+             unoptimized
           />
         </div>
       </div>

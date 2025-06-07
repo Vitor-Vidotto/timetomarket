@@ -10,7 +10,7 @@ import { auth } from "../../firebase";
 import useAuth from "../../hook/useAuth"
 
 const PainelUserNavBar = () => {
-    const { user } = useAuth();
+     const { user } = useAuth() as { user: { email: string } | null };
 
     return (
         <nav className="fixed mx-auto border border-[#33353F] top-0 left-0 right-0 z-10 bg-[#121212] bg-opacity-100">
@@ -19,8 +19,17 @@ const PainelUserNavBar = () => {
                     <>
                         <Text color="white">Painel Usuário</Text>
                         <Text color="white">{user.email}</Text>
-                        <CloseButton width={50} border backgroundColor={"brown"} borderRadius={16} borderColor={"red"} color={"red"} onClick={() => auth.signOut()}>Sair</CloseButton>
-                    </>
+                                                <CloseButton
+                          width={50}
+                          border="1px solid"
+                          backgroundColor="brown"
+                          borderRadius={16}
+                          borderColor="red"
+                          color="red"
+                          onClick={() => auth.signOut()}
+                        >
+                          Sair
+                        </CloseButton></>
                 )}
             </div>
         </nav >

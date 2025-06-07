@@ -2,7 +2,7 @@
 
 import Auth from "../components/login/Auth";
 import Navbar from "../components/NavBar";
-import PainelUserNavBar from "../components/navbars/PainelUserNavBar ";
+import PainelUserNavBar from "../components/navbars/PainelUserNavBar";
 import AddTodo from "../components/kanban/AddTodo";
 import TodoListeditUser from "../components/kanban/TodoListEditUser";
 import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
